@@ -1,0 +1,55 @@
+find . -name '*.bin' -delete
+find . -name '*.eps' -delete
+#find . -name '*.png' -delete
+
+snapit=20
+FigureType=4   # 1-ux, 2-uz, 3-vx, 4-vz
+nx=601 nz=601 dx=1 dz=1
+Fwidth=6 Fheight=6
+axis_d1=100 axis_d2=100
+umax= umin=
+lmax= lmin= legend_dv=
+
+a2b < ../bin/UX_$snapit.txt n1=$nz > UX_$snapit.bin
+a2b < ../bin/UZ_$snapit.txt n1=$nz > UZ_$snapit.bin
+a2b < ../bin/VX_$snapit.txt n1=$nz > VX_$snapit.bin
+a2b < ../bin/VZ_$snapit.txt n1=$nz > VZ_$snapit.bin
+#########################################################
+if [ $FigureType -eq 1 ]; then	
+	InputFileName=UX_$snapit.bin OutputEpsName=UX_$snapit.eps
+	OutputPngName=UX_$snapit.png FigureTitle="Displace_X_$snapit"
+elif [ $FigureType -eq 2 ]; then
+    InputFileName=UZ_$snapit.bin OutputEpsName=UZ_$snapit.eps
+	OutputPngName=UZ_$snapit.png FigureTitle="Displace_Z_$snapit"
+elif [ $FigureType -eq 3 ]; then
+    InputFileName=VX_$snapit.bin OutputEpsName=VX_$snapit.eps
+	OutputPngName=VX_$snapit.png FigureTitle="Velocity_X_$snapit"
+elif [ $FigureType -eq 4 ]; then
+    InputFileName=VZ_$snapit.bin OutputEpsName=VZ_$snapit.eps 
+	OutputPngName=VZ_$snapit.png FigureTitle="Velocity_Z_$snapit"
+fi
+echo -n "<Drawing $FigureTitle>"
+#########################################################
+psimage title=$FigureTitle titlesize=24						\
+		width=$Fwidth height=$Fheight						\
+		n1=$nz n2=$nx d1=$dz d2=$dx							\
+		d1num=$axis_d1 d2num=$axis_d2						\
+		label1='Depth(m)' label2='Distance(m)'				\
+		bclip=$umax wclip=$umin 							\
+		legend=1 lstyle=vertright units=''					\
+		labelsize=24 lx=$(echo "$Fwidth+1.8"|bc)			\
+		lend=$lmax  lbeg=$lmin  ldnum=$legend_dv			\
+		lwidth=0.3 lheight=$Fheight							\
+		wrgb=0.0,0.0,1.0 grgb=1.0,1.0,1.0 brgb=1.0,0.0,0.0	\
+	< $InputFileName >$OutputEpsName
+
+gs -dEPSCrop -dTesxtAlphaBites=10 -r600x600 -sDEVICE=png16m \
+   -sOutputFile=$OutputPngName -dBATCH -dNOPAUSE $OutputEpsName
+
+exit 0
+
+#convert -density 600 -resize 100% -colorspace rgb $OutputEpsName $OutputPngName
+
+# bhls=0,0.6,1 whls=0.6,0.1,1 ghls=0.5,1,1		wrgb=0,0,1 grgb=1,1,1 brgb=1,0,0			\
+
+# wrgb=0,0,0 grgb=1,0,0 brgb=1,1,1

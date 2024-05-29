@@ -1,0 +1,30 @@
+
+InputFileName=../bin/source.txt
+OutputFileName=../bin/source.bin
+OutputEpsName=source.eps
+OutputPngName=source.png
+
+a2b < $InputFileName > $OutputFileName
+# display wavelet in time domain
+ampmin= ampmax=
+begt= endt=0.25
+amptic= 
+psgraph < $OutputFileName n1=2001\
+        wbox=5 hbox=3 f1num= f2num= \
+        x1beg=$begt x1end=$endt d1num= n1tic=2 \
+        x2beg=$ampmin x2end=$ampmax d2num=$amptic n2tic=2 f2num=-0.5\
+        label2='Amplitude' label1='Time(s)' \
+        labelsize=15 \
+        linecolor=black linewidth=2.0 \
+        > $OutputEpsName
+
+gs -dEPSCrop -dTesxtAlphaBites=10 -r600x600 -sDEVICE=png16m \
+   -sOutputFile=$OutputPngName -dBATCH -dNOPAUSE $OutputEpsName
+
+# convert -density 600 -resize 100% -colorspace rgb $OutputEpsName $OutputPngName
+
+exit 0
+
+# bhls=0,0.6,1 whls=0.6,0.1,1 ghls=0.5,1,1		wrgb=0,0,1 grgb=1,1,1 brgb=1,0,0			\
+
+# wrgb=0,0,0 grgb=1,0,0 brgb=1,1,1
